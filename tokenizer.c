@@ -38,19 +38,9 @@ char *tokenize(char *code, Token **tokens, ssize_t *len_ptr) {
         } else if (s[0] == '*') {
             ADD_TOK(TOK_STAR);
         } else if (s[0] == '+') {
-            if (s[1] == '+') {
-                ++s;
-                ADD_TOK(TOK_INC);
-            } else {
-                ADD_TOK(TOK_PLUS);
-            }
+            ADD_TOK(TOK_PLUS);
         } else if (s[0] == '-') {
-            if (s[1] == '-') {
-                ++s;
-                ADD_TOK(TOK_DEC);
-            } else {
-                ADD_TOK(TOK_MINUS);
-            }
+            ADD_TOK(TOK_MINUS);
         } else if (s[0] == '&') {
             // doesn't find ands by design - this is the parser's job, since both &&x and x&&y are valid.
             ADD_TOK(TOK_AMPERSAND);
@@ -264,12 +254,6 @@ char *token_to_string(Token t) {
         }
         case TOK_STAR: {
             return_str("*");
-        }
-        case TOK_INC: {
-            return_str("++");
-        }
-        case TOK_DEC: {
-            return_str("--");
         }
         case TOK_AMPERSAND: {
             return_str("&");

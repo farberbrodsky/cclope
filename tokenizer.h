@@ -10,7 +10,7 @@ enum {
     TOK_IF, TOK_ELSE, TOK_FOR, TOK_WHILE, TOK_RETURN,                                      // control
     TOK_COMMA, TOK_SEMICOLON,                                                              // seperators
     TOK_DOT, TOK_ARROW,                                                                    // properties
-    TOK_PLUS, TOK_MINUS, TOK_SLASH, TOK_STAR, TOK_INC, TOK_DEC,                            // arithmetic
+    TOK_PLUS, TOK_MINUS, TOK_SLASH, TOK_STAR,                                              // arithmetic
     TOK_AMPERSAND, TOK_OR, TOK_BITOR, TOK_BITXOR, TOK_NOT, TOK_BITNOT,                     // logic
     TOK_ASSIGN, TOK_EQ, TOK_NEQ, TOK_GREATER, TOK_GREATER_EQUAL, TOK_LESS, TOK_LESS_EQUAL, // comparisons
     TOK_IDENTIFIER, TOK_STRING, TOK_CHAR, TOK_NUMBER,                                      // stored in strings
