@@ -64,15 +64,20 @@ char *tokenize(char *code, Token **tokens, ssize_t *len_ptr) {
         } else if (s[0] == '^') {
             ADD_TOK(TOK_BITWISE_XOR);
         } else if (s[0] == '!') {
-            ADD_TOK(TOK_NOT);
+            if (s[1] == '=') {
+                ++s;
+                ADD_TOK(TOK_NEQ);
+            } else {
+                ADD_TOK(TOK_NOT);
+            }
         } else if (s[0] == '~') {
             ADD_TOK(TOK_BITWISE_NOT);
         } else if (s[0] == '=') {
             if (s[1] == '=') {
                 ++s;
-                ADD_TOK(TOK_EQUAL_EQUAL);
+                ADD_TOK(TOK_EQ);
             } else {
-                ADD_TOK(TOK_EQUAL);
+                ADD_TOK(TOK_ASSIGN);
             }
         } else if (s[0] == '>') {
             if (s[1] == '=') {
@@ -135,7 +140,7 @@ char *tokenize(char *code, Token **tokens, ssize_t *len_ptr) {
             memcpy(tok.content, s, i * sizeof(char));
             tok.content[i] = '\0';
             ADD_TOK(TOK_NUMBER);
-            s += i;
+            s += i - 1;
         } else if (IS_IDENTIFIER_CHAR(s[0])) {
             // read identifier to the end
             ssize_t i = 0;
@@ -183,8 +188,9 @@ char *tokenize(char *code, Token **tokens, ssize_t *len_ptr) {
                 free(tok.content);
                 tok.content = NULL;
                 ADD_TOK(TOK_TYPEDEF);
+            } else {
+                ADD_TOK(TOK_IDENTIFIER);
             }
-            ADD_TOK(TOK_IDENTIFIER);
             s += i;
         } else if (*s == '#') {
             char *str = malloc(62);
@@ -203,6 +209,148 @@ char *tokenize(char *code, Token **tokens, ssize_t *len_ptr) {
         *len_ptr = len;
     }
     return "";
+}
+
+char *token_to_string(Token t) {
+    #define return_str(s) char *result = malloc(strlen(s) + 1); strcpy(result, s); return result;
+    switch (t.type) {
+        case TOK_LEFT_PAREN: {
+            return_str("(");
+        }
+        case TOK_RIGHT_PAREN: {
+            return_str(")");
+        }
+        case TOK_LEFT_BRACE: {
+            return_str("{");
+        }
+        case TOK_RIGHT_BRACE: {
+            return_str("}");
+        }
+        case TOK_IF: {
+            return_str("if");
+        }
+        case TOK_ELSE: {
+            return_str("else");
+        }
+        case TOK_FOR: {
+            return_str("for");
+        }
+        case TOK_WHILE: {
+            return_str("while");
+        }
+        case TOK_RETURN: {
+            return_str("return");
+        }
+        case TOK_COMMA: {
+            return_str(",");
+        }
+        case TOK_SEMICOLON: {
+            return_str(";");
+        }
+        case TOK_DOT: {
+            return_str(".");
+        }
+        case TOK_ARROW: {
+            return_str("->");
+        }
+        case TOK_PLUS: {
+            return_str("+");
+        }
+        case TOK_MINUS: {
+            return_str("-");
+        }
+        case TOK_SLASH: {
+            return_str("/");
+        }
+        case TOK_STAR: {
+            return_str("*");
+        }
+        case TOK_INC: {
+            return_str("++");
+        }
+        case TOK_DEC: {
+            return_str("--");
+        }
+        case TOK_AMPERSAND: {
+            return_str("&");
+        }
+        case TOK_OR: {
+            return_str("||");
+        }
+        case TOK_BITWISE_OR: {
+            return_str("|");
+        }
+        case TOK_BITWISE_XOR: {
+            return_str("^");
+        }
+        case TOK_NOT: {
+            return_str("!");
+        }
+        case TOK_BITWISE_NOT: {
+            return_str("~");
+        }
+        case TOK_ASSIGN: {
+            return_str("=");
+        }
+        case TOK_EQ: {
+            return_str("==");
+        }
+        case TOK_NEQ: {
+            return_str("!=")
+        }
+        case TOK_GREATER: {
+            return_str(">");
+        }
+        case TOK_GREATER_EQUAL: {
+            return_str(">=");
+        }
+        case TOK_LESS: {
+            return_str("<");
+        }
+        case TOK_LESS_EQUAL: {
+            return_str("<=");
+        }
+        case TOK_IDENTIFIER: {
+            char *result = malloc(13 + strlen(t.content));
+            strcpy(result, "(identifier)");
+            strcpy(result + 12, t.content);
+            return result;
+        }
+        case TOK_STRING: {
+            char *result = malloc(3 + strlen(t.content));
+            result[0] = '"';
+            memcpy(result + 1, t.content, strlen(t.content));
+            result[strlen(t.content) + 1] = '"';
+            result[strlen(t.content) + 2] = '\0';
+            return result;
+        }
+        case TOK_NUMBER: {
+            char *result = malloc(strlen(t.content) + 1);
+            strcpy(result, t.content);
+            return result;
+        }
+        case TOK_TYPEDEF: {
+            return_str("typedef");
+        }
+        case TOK_STATIC: {
+            return_str("static");
+        }
+        case TOK_CONST: {
+            return_str("const");
+        }
+        case TOK_ENUM: {
+            return_str("enum");
+        }
+        case TOK_STRUCT: {
+            return_str("struct");
+        }
+        case TOK_PREPROCESSOR_DIRECTIVE: {
+            return_str("(preprocessor directive)");
+        }
+        default: {
+            return_str("(unknown)");
+        }
+    }
 }
 
 #undef IS_DIGIT
