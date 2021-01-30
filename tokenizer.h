@@ -19,6 +19,6 @@ typedef struct {
     ssize_t     line;
 } Token;
 
-// Puts tokens in the provided array.
-// Returns how many tokens there are.
-ssize_t tokenize(char *code, Token **tokens);
+// Puts tokens in the provided array, and the length in a pointer len.
+// Returns "\0" if it ran successfuly or a detailed explanation of the error if it failed.
+char *tokenize(char *code, Token **tokens, ssize_t *len_ptr);
