@@ -6,13 +6,16 @@
 char *tokenize(char *code, Token **tokens, ssize_t *len_ptr) {
     ssize_t len = 0;
     ssize_t line_number = 1;
+    *tokens = malloc(0);
     for (char *s = code; *s != '\0'; ++s) {
         Token tok;
         tok.line = line_number;
+        tok.content = NULL;
         #define ADD_TOK(t) *tokens = realloc(*tokens, (len + 1) * sizeof(Token)); tok.type = t; (*tokens)[(len++)] = tok;
         if (s[0] == '\n') {
             ++line_number;
-            break;
+        } else if (s[0] == ' ' || s[0] == '\t') {
+            // do nothing
         } else if (s[0] == '(') {
             ADD_TOK(TOK_LEFT_PAREN);
         } else if (s[0] == ')') {
@@ -96,18 +99,17 @@ char *tokenize(char *code, Token **tokens, ssize_t *len_ptr) {
         } else if (s[0] == '\"') {
             ssize_t result_len = 1;
             char *result = malloc(result_len);
-            char *c = s;
-            while (*c != '\0') {
+            while (*s != '\0') {
                 result = realloc(result, result_len++);
-                if (*c == '\\') {
-                    ++c;
-                    if (*c == 'n') {
+                if (*s == '\\') {
+                    ++s;
+                    if (*s == 'n') {
                         result[result_len - 1] = '\n';
-                    } else if (*c == 'r') {
+                    } else if (*s == 'r') {
                         result[result_len - 1] = '\r';
-                    } else if (*c == 't') {
+                    } else if (*s == 't') {
                         result[result_len - 1] = '\t';
-                    } else if (*c == '"') {
+                    } else if (*s == '"') {
                         result[result_len - 1] = '"';
                     } else {
                         free(result);
@@ -115,22 +117,87 @@ char *tokenize(char *code, Token **tokens, ssize_t *len_ptr) {
                         sprintf(str, "SyntaxError: unknown escape code on line %zu", line_number);
                         return str;
                     }
-                } else if (*c == '"') {
+                } else if (*s == '"') {
                     break;
                 } else {
-                    result[result_len - 1] = *c;
+                    result[result_len - 1] = *s;
                 }
-                ++c;
+                ++s;
             }
             result[result_len] = '\0';
             tok.content = result;
             ADD_TOK(TOK_STRING);
+        } else if (IS_DIGIT(s[0])) {
+            // number - keep in a string every digit or .
+            ssize_t i = 0;
+            for (; IS_DIGIT(s[i]) || s[i] == '.'; ++i);
+            tok.content = malloc(i + 1);
+            memcpy(tok.content, s, i * sizeof(char));
+            tok.content[i] = '\0';
+            ADD_TOK(TOK_NUMBER);
+            s += i;
+        } else if (IS_IDENTIFIER_CHAR(s[0])) {
+            // read identifier to the end
+            ssize_t i = 0;
+            for (; IS_IDENTIFIER_CHAR(s[i]) || IS_DIGIT(s[i]); ++i);
+            tok.content = malloc(i + 1);
+            memcpy(tok.content, s, i * sizeof(char));
+            tok.content[i] = '\0';
+            if (i == 2 && strcmp(tok.content, "if") == 0) {
+                free(tok.content);
+                tok.content = NULL;
+                ADD_TOK(TOK_IF);
+            } else if (i == 3 && strcmp(tok.content, "for") == 0) {
+                free(tok.content);
+                tok.content = NULL;
+                ADD_TOK(TOK_FOR);
+            } else if (i == 4 && strcmp(tok.content, "else") == 0) {
+                free(tok.content);
+                tok.content = NULL;
+                ADD_TOK(TOK_ELSE);
+            } else if (i == 4 && strcmp(tok.content, "enum") == 0) {
+                free(tok.content);
+                tok.content = NULL;
+                ADD_TOK(TOK_ELSE);
+            } else if (i == 5 && strcmp(tok.content, "while") == 0) {
+                free(tok.content);
+                tok.content = NULL;
+                ADD_TOK(TOK_WHILE);
+            } else if (i == 5 && strcmp(tok.content, "const") == 0) {
+                free(tok.content);
+                tok.content = NULL;
+                ADD_TOK(TOK_CONST);
+            } else if (i == 6 && strcmp(tok.content, "return") == 0) {
+                free(tok.content);
+                tok.content = NULL;
+                ADD_TOK(TOK_RETURN);
+            } else if (i == 6 && strcmp(tok.content, "static")) {
+                free(tok.content);
+                tok.content = NULL;
+                ADD_TOK(TOK_TYPEDEF);
+            } else if (i == 6 && strcmp(tok.content, "struct")) {
+                free(tok.content);
+                tok.content = NULL;
+                ADD_TOK(TOK_STRUCT);
+            } else if (i == 7 && strcmp(tok.content, "typedef") == 0) {
+                free(tok.content);
+                tok.content = NULL;
+                ADD_TOK(TOK_TYPEDEF);
+            }
+            ADD_TOK(TOK_IDENTIFIER);
+            s += i;
+        } else if (*s == '#') {
+            char *str = malloc(62);
+            sprintf(str, "SyntaxError: cclope currently does not support preprocessor directive on line %zu", line_number);
+            return str;
+        } else {
+            char *str = malloc(62);
+            sprintf(str, "SyntaxError: unknown token on line %zu", line_number);
+            return str;
         }
         #undef ADD_TOK
         // missing:
-        // TOK_IF, TOK_ELSE, TOK_FOR, TOK_WHILE, TOK_RETURN,
-        // TOK_IDENTIFIER, TOK_NUMBER,
-        // TOK_TYPEDEF, TOK_STATIC, TOK_CONST, TOK_ENUM, TOK_STRUCT, TOK_PREPROCESSOR_DIRECTIVE
+        // TOK_PREPROCESSOR_DIRECTIVE
     }
     if (len_ptr != NULL) {
         *len_ptr = len;
