@@ -59,10 +59,10 @@ char *tokenize(char *code, Token **tokens, ssize_t *len_ptr) {
                 ++s;
                 ADD_TOK(TOK_OR);
             } else {
-                ADD_TOK(TOK_BITWISE_OR);
+                ADD_TOK(TOK_BITOR);
             }
         } else if (s[0] == '^') {
-            ADD_TOK(TOK_BITWISE_XOR);
+            ADD_TOK(TOK_BITXOR);
         } else if (s[0] == '!') {
             if (s[1] == '=') {
                 ++s;
@@ -71,7 +71,7 @@ char *tokenize(char *code, Token **tokens, ssize_t *len_ptr) {
                 ADD_TOK(TOK_NOT);
             }
         } else if (s[0] == '~') {
-            ADD_TOK(TOK_BITWISE_NOT);
+            ADD_TOK(TOK_BITNOT);
         } else if (s[0] == '=') {
             if (s[1] == '=') {
                 ++s;
@@ -277,16 +277,16 @@ char *token_to_string(Token t) {
         case TOK_OR: {
             return_str("||");
         }
-        case TOK_BITWISE_OR: {
+        case TOK_BITOR: {
             return_str("|");
         }
-        case TOK_BITWISE_XOR: {
+        case TOK_BITXOR: {
             return_str("^");
         }
         case TOK_NOT: {
             return_str("!");
         }
-        case TOK_BITWISE_NOT: {
+        case TOK_BITNOT: {
             return_str("~");
         }
         case TOK_ASSIGN: {

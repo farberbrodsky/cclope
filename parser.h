@@ -7,7 +7,7 @@ typedef enum {
     EXPR_POST_INC, EXPR_POST_DEC, EXPR_FUNC_CALL,                   // precidence 1
     EXPR_ARRAY_INDEX, EXPR_DOT, EXPR_ARROW,                         // precidence 1
     EXPR_PRE_INC, EXPR_PRE_DEC, EXPR_UNARY_PLUS, EXPR_UNARY_MINUS,  // precidence 2
-    EXPR_NOT, EXPR_BITWISE_NOT, EXPR_DEREF, EXPR_ADDR, EXPR_SIZEOF, // precidence 2
+    EXPR_NOT, EXPR_BITNOT, EXPR_DEREF, EXPR_ADDR, EXPR_SIZEOF,      // precidence 2
     EXPR_MUL, EXPR_DIV, EXPR_MOD,                                   // precidence 3
     EXPR_ADD, EXPR_SUB,                                             // precidence 4
     EXPR_SHLEFT, EXPR_SHRIGHT,                                      // precidence 5
@@ -40,5 +40,6 @@ typedef struct {
 // Moves tokens pointer in-place to where the expression ends.
 // Returns "" if it parsed successfuly or a detailed explanation of the error if it failed.
 char *parse_expr(Token **tokens, Expr *expr);
+void Expr_free(Expr expr);
 
 #endif
