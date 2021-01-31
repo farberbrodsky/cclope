@@ -14,7 +14,8 @@ enum {
     TOK_AMPERSAND, TOK_OR, TOK_BITOR, TOK_BITXOR, TOK_NOT, TOK_BITNOT,                     // logic
     TOK_ASSIGN, TOK_EQ, TOK_NEQ, TOK_GREATER, TOK_GREATER_EQUAL, TOK_LESS, TOK_LESS_EQUAL, // comparisons
     TOK_IDENTIFIER, TOK_STRING, TOK_CHAR, TOK_NUMBER,                                      // stored in strings
-    TOK_TYPEDEF, TOK_STATIC, TOK_CONST, TOK_ENUM, TOK_STRUCT, TOK_PREPROCESSOR_DIRECTIVE   // misc.
+    TOK_TYPEDEF, TOK_STATIC, TOK_CONST, TOK_ENUM, TOK_STRUCT, TOK_PREPROCESSOR_DIRECTIVE,  // misc.
+    TOK_EOF                                                                                // put at the end of files
 } typedef TOKEN_TYPE;
 
 typedef struct {

@@ -23,7 +23,9 @@ typedef enum {
     EXPR_ASSIGN_MUL,    EXPR_ASSIGN_DIV,     EXPR_ASSIGN_MOD,       // precidence 14
     EXPR_ASSIGN_SHLEFT, EXPR_ASSIGN_SHRIGHT,                        // precidence 14
     EXPR_ASSIGN_BITAND, EXPR_ASSIGN_BITXOR,  EXPR_ASSIGN_BITOR,     // precidence 14
-    EXPR_COMMA                                                      // precidence 15
+    EXPR_COMMA,                                                     // precidence 15
+    EXPR_UNKOWN,                                                    // intermediary for unparsed tokens
+    EXPR_IDENTIFIER, EXPR_NUMBER                                    // same as with the token
 } EXPR_TYPE;
 
 typedef struct {
@@ -37,9 +39,10 @@ typedef struct {
     Expr b;
 } ExprTwo;
 
-// Moves tokens pointer in-place to where the expression ends.
+// Moves tokens pointer in-place to where the expression ends. tok_count is how many tokens are there after this token.
+// Gets end where it should stop looking for tokens or 0 to look automatically.
 // Returns "" if it parsed successfuly or a detailed explanation of the error if it failed.
-char *parse_expr(Token **tokens, Expr *expr);
+char *parse_expr(Token **tokens, Expr *expr, ssize_t tok_count);
 void Expr_free(Expr expr);
 
 #endif

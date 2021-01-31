@@ -191,10 +191,18 @@ char *tokenize(char *code, Token **tokens, ssize_t *len_ptr) {
             sprintf(str, "SyntaxError: unknown token on line %zu", line_number);
             return str;
         }
-        #undef ADD_TOK
         // missing:
         // TOK_PREPROCESSOR_DIRECTIVE
+        #undef ADD_TOK
     }
+    // add EOF
+    Token tok;
+    tok.line = line_number + 1;
+    tok.content = NULL;
+    tok.type = TOK_EOF;
+    *tokens = realloc(*tokens, (len + 1) * sizeof(Token));
+    (*tokens)[len] = tok;
+
     if (len_ptr != NULL) {
         *len_ptr = len;
     }
@@ -327,6 +335,9 @@ char *token_to_string(Token t) {
         }
         case TOK_STRUCT: {
             return_str("struct");
+        }
+        case TOK_EOF: {
+            return_str("(EOF)");
         }
         case TOK_PREPROCESSOR_DIRECTIVE: {
             return_str("(preprocessor directive)");
