@@ -8,6 +8,7 @@ char *tokenize(char *code, Token **tokens, ssize_t *len_ptr) {
     ssize_t line_number = 1;
     *tokens = malloc(0);
     for (char *s = code; *s != '\0'; ++s) {
+        printf("%c\n", *s);
         Token tok;
         tok.line = line_number;
         tok.content = NULL;
@@ -181,7 +182,7 @@ char *tokenize(char *code, Token **tokens, ssize_t *len_ptr) {
             } else {
                 ADD_TOK(TOK_IDENTIFIER);
             }
-            s += i;
+            s += i - 1;
         } else if (*s == '#') {
             char *str = malloc(62);
             sprintf(str, "SyntaxError: cclope currently does not support preprocessor directive on line %zu", line_number);
