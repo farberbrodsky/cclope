@@ -349,5 +349,9 @@ char *token_to_string(Token t) {
     }
 }
 
+void Token_free(Token t) {
+    free(t.content);
+}
+
 #undef IS_DIGIT
 #undef IS_IDENTIFIER_CHAR

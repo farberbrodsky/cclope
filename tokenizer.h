@@ -29,5 +29,6 @@ typedef struct {
 char *tokenize(char *code, Token **tokens, ssize_t *len_ptr);
 // Debugging representation of a token.
 char *token_to_string(Token t);
+void Token_free(Token t);
 
 #endif
